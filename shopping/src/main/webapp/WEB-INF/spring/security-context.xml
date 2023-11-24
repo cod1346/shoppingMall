@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-5.6.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	
+	<!-- 비밀번호 암호화 담당 -->
+	<bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	
+	<!-- spring security -->
+	<security:http>
+	  	<security:intercept-url pattern="/item/create" access="hasAuthority('ROLE_ADMIN')" />
+		<security:form-login login-page="/member/login" authentication-failure-url="/member/login-error"/>
+		<security:logout invalidate-session="true" /> <!-- 로그아웃 시 세션 없애기 -->
+		<security:access-denied-handler ref="customAccessDeniedHandler" />
+	</security:http>
+	
+	<bean id="customAccessDeniedHandler" class="com.spring.handelr.CustomAccessDeniedHandler" />
+
+	<security:authentication-manager>
+   		<security:authentication-provider user-service-ref="customUserDetailService">
+  	   		<security:password-encoder ref="encoder"/>
+	    </security:authentication-provider>
+	</security:authentication-manager>
+	
+	
+	
+	
+</beans>

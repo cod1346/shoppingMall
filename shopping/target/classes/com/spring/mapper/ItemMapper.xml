@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.mapper.ItemMapper">
+	
+	
+	<!-- insert -->
+	<select id="getNextIno" resultType="int">
+    	SELECT ino_seq.NEXTVAL FROM DUAL
+	</select>
+	<insert id="create">
+		INSERT INTO item(ino, username,itemname, price,tax,regdate,imagepath,origin,ingredient,point,gender,delivery,tel)
+		VALUES(#{ino}, #{username},#{itemName},#{price},#{tax},sysdate,#{imagePath},#{origin},#{ingredient},#{point},#{gender},#{delivery},#{tel})
+	</insert>
+	<insert id="createImages">
+		INSERT INTO itemImages(ino,uploadPath)
+		VALUES(#{ino},#{uploadPath})
+	</insert>
+		
+	<!-- 전체리스트 -->
+	<!-- <select id="list" resultType="com.spring.domain.ItemDTO">
+		select * from item order by ino asc
+	</select> -->
+	<!-- 페이지 나누기 조회  -->
+	<select id="list" resultType="com.spring.domain.ItemDTO">
+		<![CDATA[
+			select ino, username,itemname, price,tax,regdate,imagepath,origin,ingredient,point,gender,delivery,tel
+			from(select /*+index_desc(item pk_item)*/rownum rn, ino, username,itemname, price,tax,regdate,imagepath,origin,ingredient,point,gender,delivery,tel
+   		    	 from item
+  	    	     where
+  	    	     rownum<=#{page}*#{amount})
+			where rn>(#{page}-1)*#{amount}
+		]]>
+	</select> 
+	<!-- 페이지 나누기 조회  -->
+	<!-- 전체 게시물 갯수 -->
+	<select id="totalCnt" resultType="java.lang.Integer">
+		select count(*) from item
+	</select>
+	<!-- 전체 게시물 갯수 -->
+	<!-- 좋아요추가 -->
+	<insert id="insertLike">
+		INSERT INTO item_like(ino, username)
+		VALUES(#{ino},#{username})
+	</insert>
+	<!-- 좋아요 삭제 -->
+	<delete id="deleteLike">
+		delete from item_like where ino=#{ino} and username=#{username}
+	</delete>
+	<!-- 좋아요 갯수 -->
+	<select id="likeCount">
+		select count(*) from item_like where ino=#{ino}
+	</select>
+	<!-- 좋아요 조회 -->
+	<select id="chkLike">
+		select count(*) from item_like where ino=#{ino} and username=#{username}
+	</select>
+	
+	<!-- 상품 삭제 -->
+	<delete id="deleteItem">
+		delete from item where ino=#{ino}
+	</delete>
+	<delete id="deleteItemImages">
+		delete from itemimages where ino=#{ino}
+	</delete>
+	
+	<!-- 상품 삭제시 좋아요삭제 -->
+	<delete id="deleteLikeAll">
+		delete from item_like where ino=#{ino}
+	</delete>
+	<!-- 상품조회 -->
+	<select id="readItem">
+		select * from item where ino=#{ino}
+	</select>
+	<select id="readItemImages">
+		select * from itemimages where ino=#{ino}
+	</select>
+	<!-- 장바구니 추가 -->
+	<insert id="insertCart">
+		INSERT INTO cart(cno,ino,username,amount,itemName,price,imagePath,tax,totalPrice)
+		VALUES(cno_seq.nextval,#{ino},#{username},#{amount},#{itemName},#{price},#{imagePath},#{tax},#{totalPrice})
+	</insert>
+	<select id="readCart">
+		select * from cart where username=#{username}
+	</select>
+	<!-- 주문테이블 추가 -->
+	<insert id="insertOrder">
+		INSERT INTO cart_order(ino,username,amount,orderNo,orderDate,price,imagePath,itemname,tax)
+		VALUES(#{ino},#{username},#{amount},#{orderNo},sysdate,#{price},#{imagePath},#{itemName},#{tax})
+	</insert>
+	<select id="chkOrder">
+		select * from cart_order where username=#{username}
+	</select>
+	<select id="adminOrder">
+		select * from cart_order
+	</select>
+	<update id="setTotalPrice">
+		update cart_order set totalPrice = #{totalPrice} where orderNo = #{orderNo}
+	</update>
+	<!-- 주문번호 insert -->
+	<select id="getNextOrderNo" resultType="int">
+    	SELECT orderNo_seq.NEXTVAL FROM DUAL
+	</select>
+	<!-- 장바구니 삭제 -->
+	<delete id="deleteCart">
+		delete from cart where cno=#{cno}
+	</delete>
+	<update id="updateDelivery">
+		update cart_order set delivery = #{delivery} where orderNo = #{orderNo}
+	</update>
+	<!-- 쿠폰생성 -->
+	<insert id="createCoupon">
+	INSERT INTO coupon(couponVal) VALUES (#{couponVal})
+	</insert>
+	<select id="currCoupon" resultType="String">
+	SELECT TO_CHAR(SYSDATE, 'YYYY') || '-' || LPAD(couponNo_seq.CURRVAL, 5, '0') FROM DUAL
+	</select>
+	<!-- 쿠폰조회 -->
+	<select id="readCoupon" resultType="com.spring.domain.CouponDTO">
+    	select * FROM coupon where couponNo=#{couponNo}
+	</select>
+	<update id="updateCoupon">
+		update coupon set username = #{username} where couponNo = #{couponNo}
+	</update>
+	<select id="readUsernameCoupon" resultType="com.spring.domain.CouponDTO">
+    	select * FROM coupon where username=#{username}
+	</select>
+	<!-- 쿠폰적용 -->
+	<update id="useCoupon">
+		update coupon set orderNo = #{orderNo} where couponNo = #{couponNo}
+	</update>
+	<select id="readOrderNoCoupon">
+    	select * FROM coupon where orderNo=#{orderNo}
+	</select>
+	<update id="updateCouponStatus">
+		update coupon set status=1 where orderNo=#{orderNo}
+	</update>
+	<!-- 매출현황 -->
+	<select id="readDateOrder">
+    	SELECT * FROM cart_order where orderDate BETWEEN TO_DATE(#{sdfDate00}, 'YY-MM-DD-HH24') AND TO_DATE(#{sdfDate24}, 'YY-MM-DD-HH24')
+	</select>
+	<!--매출메모-->
+	<select id="readDiary">
+    	SELECT * FROM order_diary where regdate BETWEEN TO_DATE(#{sdfDate00}, 'YY-MM-DD-HH24') AND TO_DATE(#{sdfDate24}, 'YY-MM-DD-HH24')
+	</select>
+	<update id="updateDateMemo">
+		update order_diary set content=#{content} where regDate=#{regDate}
+	</update>
+	<insert id="insertDiary">
+		INSERT INTO order_diary(content,regDate)
+		VALUES(#{content},#{regDate})
+	</insert>
+	<!-- 총액 테이블 -->
+	<select id="readTotalPriceOrderNo">
+    	SELECT * FROM order_totalprice where orderNo=#{orderNo}
+	</select>
+	<insert id="insertTotalPrice">
+		INSERT INTO order_totalprice(orderNo,totalPrice)
+		VALUES(#{orderNo},#{totalPrice})
+	</insert>
+	<select id="readTotalPriceOrderAll">
+    	SELECT * FROM order_totalprice
+	</select>
+	<select id="readTotalPrice">
+    	SELECT totalPrice FROM order_totalprice where orderNo=#{orderNo}
+	</select>
+	<update id="updateTotalPrice">
+		update order_totalPrice set totalPrice=#{totalPrice}+#{addPrice} where orderNo=#{orderNo}
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

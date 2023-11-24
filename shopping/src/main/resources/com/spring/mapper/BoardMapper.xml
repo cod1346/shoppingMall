@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.mapper.BoardMapper">
+	
+	
+		
+	<!-- 전체리스트 -->
+	<select id="list" resultType="com.spring.domain.BoardDTO">
+		select * from board order by bno asc
+	</select>
+	
+	<!-- 전체 게시물 개수 : totalCnt -->
+	<select id="totalCnt" resultType="java.lang.Integer">
+		select count(*) from board
+	</select>
+
+	<!-- insert -->
+	<insert id="create">
+		INSERT INTO board(bno, username, title, content, regdate)
+		VALUES(bno_seq.NEXTVAL, #{username} , #{title} , #{content} , sysdate)
+	</insert>
+
+	<!-- read -->
+	<select id="read" resultType="com.spring.domain.BoardDTO">
+		select * from board where bno =#{bno}
+	</select>
+	<!-- 검색 -->
+	<select id="search" resultType="com.spring.domain.BoardDTO">
+	    <![CDATA[
+	        SELECT * FROM board WHERE ${type} LIKE '%' || #{keyword} || '%'
+	    ]]>
+	</select>
+	<!-- 조회수 -->
+	<update id="cntUp">
+		update board set cnt=cnt+1 where bno=#{bno}
+	</update>
+
+	<!-- update -->
+	<update id="update">
+		update board set title=#{title}, content=#{content}, updatedate=sysdate where bno=#{bno} 
+	</update>
+	
+	<!-- 글 삭제 -->
+	<delete id="delete">
+		delete from board where bno=#{bno}
+	</delete>
+	
+	<!-- 글 삭제시 댓글 모두 삭제 -->
+	<delete id="replyDeleteAll">
+		delete from board_reply where bno=#{bno}
+	</delete>
+	<!-- 글 삭제시 답글 모두 삭제 -->
+	<delete id="reReplyDeleteBno">
+		delete from board_re_reply where bno=#{bno}
+	</delete>
+	<!-- 탈퇴시 답글 모두 삭제 -->
+	<delete id="reReplyDeleteUsername">
+		delete from board_re_reply where username=#{username}
+	</delete>
+	<!-- 탈퇴시 댓글 삭제 -->
+	<delete id="replyDeleteUsername">
+		delete from board_reply where username=#{username}
+	</delete>
+	
+	<!-- 탈퇴시 글 삭제 -->
+	<delete id="deleteAll">
+		delete from board where username=#{username}
+	</delete>
+	
+	<!-- 댓글작성 -->
+	<insert id="createReply" >
+		insert into board_reply values(#{bno},re_bno_seq.NEXTVAL,#{username},#{content},sysdate)
+	</insert>
+	
+	<!-- 댓글수정 -->
+	<update id="replyUpdate">
+		update board_reply set content=#{content} where re_bno=#{reBno} 
+	</update>
+	
+	<!-- 댓글삭제 -->
+	<delete id="replyDelete">
+		delete from board_reply where re_bno=#{reBno}
+	</delete>
+	<!-- 댓글삭제시 답글삭제 -->
+	<delete id="reReplyDeleteReBno">
+		delete from board_re_reply where re_bno=#{reBno}
+	</delete>
+	<!-- 댓글리스트 -->
+	<select id="replyList" resultMap="replyDTO">
+		select * from board_reply where bno =#{bno} order by re_bno 
+	</select>
+	
+	<!-- 답글 -->
+	<insert id="createReReply" >
+		insert into board_re_reply values(#{bno},#{reBno},re_re_bno_seq.NEXTVAL,#{username},#{reContent},sysdate)
+	</insert>
+	
+	<!-- 답글리스트 -->
+	<select id="reReplyList" resultMap="reReplyDTO">
+		select * from board_re_reply where bno =#{Bno} order by re_re_bno 
+	</select>
+	<!-- 답글수정 -->
+	<update id="reReplyUpdate">
+		update board_re_reply set content=#{reContent} where re_re_bno=#{reReBno} 
+	</update>
+	<!-- 답글삭제 -->
+	<delete id="reReplyDelete">
+		delete from board_re_reply where re_re_bno=#{reReBno}
+	</delete>
+	
+	<resultMap type="com.spring.domain.ReReplyDTO" id="reReplyDTO">
+		<id property="reReBno" column="re_re_bno"/>
+		<result property="bno" column="bno"/>
+		<result property="reBno" column="re_bno"/>
+		<result property="username" column="username"/>
+		<result property="reContent" column="content"/>
+		<result property="regDate" column="regdate"/>
+	</resultMap>
+	
+	
+	<resultMap type="com.spring.domain.ReplyDTO" id="replyDTO">
+		<id property="bno" column="bno"/>
+		<result property="reBno" column="re_bno"/>
+		<result property="username" column="username"/>
+		<result property="content" column="content"/>
+		<result property="regDate" column="regdate"/>
+	</resultMap>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
