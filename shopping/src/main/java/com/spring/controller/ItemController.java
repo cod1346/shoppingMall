@@ -386,7 +386,7 @@ public class ItemController {
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
 		    MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
  
-		    messageHelper.setFrom("choshopping@gmail.com"); // 보내는사람사람 이메일 
+		    messageHelper.setFrom("choshopping@gmama.sxd"); // 보내는사람사람 이메일 
 		    messageHelper.setTo(dto.getTo()); // 받는사람 이메일
 		    messageHelper.setSubject(dto.getSubject()); // 메일제목
 		    messageHelper.setText(dto.getText(),true); // 메일 내용

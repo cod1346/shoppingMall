@@ -19,9 +19,6 @@
 	<!-- @Component 어노테이션 -->
 	<context:component-scan
 		base-package="com.spring.service, com.spring.util" />
-	<!-- @Scheduled 어노테이션 -->
-	<context:component-scan
-		base-package="com.spring.schedule" />
 
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName"

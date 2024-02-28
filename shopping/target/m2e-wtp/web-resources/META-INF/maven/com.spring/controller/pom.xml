@@ -256,6 +256,16 @@
 					<downloadJavadocs>true</downloadJavadocs>
 				</configuration>
 			</plugin>
+			<!-- ec2 리눅스코드 -->
+			<plugin>
+			    <artifactId>maven-compiler-plugin</artifactId>
+			    <version>3.7.0</version>
+			    <configuration>
+			        <fork>true</fork>
+			        <executable>/usr/lib/jvm/java-11-openjdk-amd64/bin/javac</executable>
+			    </configuration>
+			</plugin>
+			<!-- ec2 리눅스코드 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
