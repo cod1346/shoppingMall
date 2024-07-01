@@ -23,7 +23,9 @@ public class BoardDTO {
 	private int cnt;
 	//전체개시물갯수
 	private int totalCnt;
-
+	
+	
+	//일단 푸쉬하기위해서 테스트용 수정
 }
 
 
