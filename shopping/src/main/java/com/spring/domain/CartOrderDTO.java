@@ -28,6 +28,8 @@ public class CartOrderDTO {
 	private int totalPrice;
 	private String couponNo;
 	private int couponVal;
+	/////////////////////
+	////
 }
 
 
