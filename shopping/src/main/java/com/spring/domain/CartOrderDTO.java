@@ -30,6 +30,7 @@ public class CartOrderDTO {
 	private int couponVal;
 	/////////////////////
 	////
+	////
 }
 
 
